@@ -26,7 +26,9 @@ vi.mock("@chakra-ui/react", async () => {
 });
 
 vi.mock("firebase/auth", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await vi.importActual<typeof import("firebase/auth")>(
+    "firebase/auth"
+  );
   return {
     ...actual,
     signInWithEmailAndPassword: vi.fn(() =>
