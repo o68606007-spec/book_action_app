@@ -30,7 +30,7 @@ vi.mock("firebase/auth", async (importOriginal) => {
     "firebase/auth"
   );
   return {
-    ...actual
+    ...actual,
     signInWithEmailAndPassword: vi.fn(() =>
       Promise.resolve({
         user: {
