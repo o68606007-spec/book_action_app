@@ -22,9 +22,9 @@ const AuthProvider = (props: AuthProviderProps) => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        console.log("AuthProvider start");
+        // console.log("AuthProvider start");
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            console.log("Auth changed", user);
+            // console.log("Auth changed", user);
             setUser(user);
             setLoading(false);
         });
