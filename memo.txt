@@ -1,0 +1,303 @@
+NavigateのほかにLinkでほかに飛ぶ
+AuthContextでユーザー状態のログイン状態を管理する
+LoginしたらHome画面が一瞬移ったが再度Loginに戻る事態が発生
+→これは Firebase Auth でかなりよくある現象。
+原因は👇
+
+👉 onAuthStateChanged() の認証確認が終わる前に
+👉 user === null と判定されているから。
+
+useEffect(() => {
+    if (loading) {
+        return <p>Loading</p>
+    }
+}, [])
+
+React的には👇扱い。
+
+「Loading画面」
+ではなく
+「関数を返そうとしてる」
+
+
+認証
+↓
+認証状態共有
+↓
+ルーティング制御
+
+これは React/Firebase の基礎コア。
+
+
+
+react-dom-client.development.js:7597 Uncaught (in promise) Error: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
+    at Book.tsx:16:26
+
+
+React Component を async にしている
+
+これが原因。
+
+なぜダメ？
+
+React Component は👇前提。
+
+同期関数
+でも今
+async () => {}
+
+なので、
+
+Promise を返す
+
+memo(async ()
+
+
+export const Book: FC = memo(async () => {
+    const { user } = useAuthContext();
+    const navigate = useNavigate();
+    const { bookId } = useParams();
+    const data = await getTableLib();
+
+memo(async())
+これは非同期関数になる
+
+
+useEffectはデータ取得
+useStateはデータ更新
+useAuthContextは認証
+
+
+
+booksとlearningsの設定方法はどうするのか
+booksのid設定方法とは？
+データの引継ぎ方法がpropでいまいちわかっていない
+
+① BookId
+
+learning を insert
+
+↓
+
+② insert後の learning.id を取得
+
+↓
+
+③ Dialog に渡す
+
+↓
+
+④ actions に learning_id を保存
+
+BookIdがnewかどうかで場合分けか
+
+🔥 なぜ？
+
+今のコード。
+
+(todo) => {
+   <div>...</div>
+}
+
+は、
+
+何も返していない
+
+扱い。
+{todos.map((todo) => (
+    <div key={todo.id}>
+        <p>{todo.content}</p>
+    </div>
+))}
+にしないと返さない
+
+
+
+
+Book→BookIdでpropで渡してもうまくいかない
+画面壊れている？
+<BookId title={book.title} />
+
+BookからBookIdは別画面だから、propsではない
+この場合useEffectで画面を取得する
+
+今回さらに難しかった理由
+
+DB絡みだった。
+
+つまり、
+
+React state
++
+Supabase INSERT
++
+Dialog
+
+が絡んでた。
+
+なので、
+
+「見た目は動くのにDB壊れる」
+
+という実務あるある状態になっていた。
+
+今回の学び
+
+かなり大事。
+
+Reactで重要な考え
+stateは「即値」ではない
+だから実務では
+
+INSERT結果などは、
+
+stateに頼らず
+ローカル変数を使う
+
+
+React の state 更新は非同期。
+
+だから、
+
+setLearningId()
+↓
+まだ反映前
+↓
+Dialog open
+↓
+learningId = null
+
+になっている。
+
+
+
+
+あれ、analysisって何を分析するかのところだよね
+type logs = {
+    id: number;
+    action_id: number;
+    executed_at: string;
+    is_done: boolean;
+    actions: {
+        content: string;
+    }
+};
+
+                    const getActionsData = await supabase.from("actions").select("*").eq("id", data.data.action_id).single();
+                    if (getActionsData.error) {
+                        console.error(getActionsData.error);
+                        return null;
+                    }
+
+別々で考えていたけど、typeで合わせているから不要
+むしろ、left outer joinのような感覚が大切
+
+
+
+            <h1>継続分析</h1>
+            {actionsLogs.map((log) => (
+                <div key={log.id}>
+                    <p>行動内容: {log.actions.content}</p>
+                    <p>継続日数: {uniqueDates.length}</p>
+                    <p>実行率: {rate}%</p>
+                </div>
+            ))}
+
+
+あなたが表示したいのは、
+
+actions ごとの分析
+
+です。
+
+つまり、
+
+React学習
+↓
+継続日数 2日
+実行率 80%
+
+みたいな単位。
+
+だから map する対象は
+actions
+
+です。
+
+
+Analysisのことで質問がある 
+画面にはデータが出力される 
+action_logsに日付ごとにデータが作成されるため2件登録され、画面にも2つ出力されてしまう 
+map型で出す場合、何か工夫はできるか。filterを出すとか？
+
+だから map する対象は
+actions
+
+です。
+
+
+
+
+Testing Library でも優先順位はこんなイメージです。
+
+getByRole
+getByLabelText
+getByText
+getByPlaceholderText
+getByTestId（最後の手段
+
+
+
+    expect(mockedNavigator).toHaveBeenCalledWith("/signup");
+
+これではなく、Link のテストは「画面遷移結果」を確認する
+
+
+HomeのcheckはTODOリストを取ってくるところだから、logテーブルは違う
+
+React のテストでは
+
+テスト失敗
+↓
+screen.debug()
+↓
+実際のDOMを見る
+↓
+stateが更新されていない箇所を探す
+↓
+mockの戻り値を確認する
+
+
+Delteしたときの書き方
+expect(screen.queryByText("A")).not.toBeInTheDocument();
+
+async
+
+supabaseはわかるけど、ほかの場合はどうするのか
+    const uniqueDates = [...new Set(actionsLogs.map(log => log.executed_at.split("T")[0]))];
+
+テストで確認すべきこと
+
+テストでは
+
+モックデータを渡した結果、画面に何が表示されるか
+
+を確認します。
+直接mockデータをするわけではない
+
+どういう風に画面に表示されるかをみたいので、関数ではなく、結果を知りたい
+
+
+つまりモックそのものが壊れているというより、
+
+「今日扱いになるデータがモックに含まれていない」 可能性が高いです。
+
+Analysis コンポーネントの「今日の実行率」の計算部分を見れば確定できます。
+
+本日日付分をみたいのか
+
+

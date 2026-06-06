@@ -1,9 +1,13 @@
-function App() {
+import { ChakraProvider, defaultSystem } from "@chakra-ui/react"
+
+import { Router } from "./router/Router";
+
+export default function App() {
   return (
     <>
-      <h1 data-testid="title">Hello World</h1>
+      <ChakraProvider value={defaultSystem}>
+        <Router />
+      </ChakraProvider>
     </>
   );
 }
-
-export default App;
