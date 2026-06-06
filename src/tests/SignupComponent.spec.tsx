@@ -27,7 +27,6 @@ vi.mock("@chakra-ui/react", async () => {
 vi.mock("firebase/auth", async (importOriginal) => {
   const actual = await importOriginal();
   return {
-    ...actual,
     createUserWithEmailAndPassword: vi.fn(() =>
       Promise.resolve({
         user: {

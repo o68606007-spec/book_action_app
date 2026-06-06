@@ -4,7 +4,7 @@ import {  Navigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 
 type PrivateRouteProps = {
-    children: JSX.Element;
+    children: ReactNode;
 }
 
 
