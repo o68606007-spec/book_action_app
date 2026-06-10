@@ -40,8 +40,9 @@ export const Home: FC = memo(() => {
 
     useEffect(() => {
         if (!user?.uid || !user.email) return;
+        const email = user.email;
         const fetchData = async () => {
-            const userNameData = await getBookUserTableLib(user.email);
+            const userNameData = await getBookUserTableLib(email);
             if (userNameData?.data) {
                 setUserName(userNameData?.data.name);
             }
