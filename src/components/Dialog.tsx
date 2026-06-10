@@ -29,12 +29,13 @@ export const Dialogs: FC<DialogProps> = memo((prop) => {
     }
 
     const onSubmit = useCallback(async (data: FormValues) => {
+        if (!user?.uid) return;
         if (!learningId) {
             console.error("Invalid learning ID");
             return;
         }
 
-        const registerData = await insertActionsTableLib({ content: data.content, learning_id: learningId, frequency: data.frequency, firebase_uid: user?.uid });
+        const registerData = await insertActionsTableLib({ content: data.content, learning_id: learningId, frequency: data.frequency, firebase_uid: user.uid });
 
         setOpen(false);
         reset();

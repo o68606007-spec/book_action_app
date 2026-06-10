@@ -47,12 +47,13 @@ export const Analysis: FC = memo(() => {
     useEffect(() => {
         (
             async () => {
+                if (!user?.uid) return;
                 const fetchData = async () => {
-                    const logsData = await getActionsLogTableLib(user?.uid);
+                    const logsData = await getActionsLogTableLib(user.uid);
                     if (logsData?.data) {
                         setActionsLogs(logsData?.data);
                     }
-                    const actionIndividualData = await getActionIndividualTableLib(user?.uid);
+                    const actionIndividualData = await getActionIndividualTableLib(user.uid);
                     if (actionIndividualData?.data) {
                         setActions(actionIndividualData?.data);
                     }

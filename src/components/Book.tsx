@@ -21,8 +21,9 @@ export const Book: FC = memo(() => {
     const [books, setBooks] = useState<BookType[]>([]);
 
     useEffect(() => {
+        if (!user?.uid) return;
         const fetchData = async () => {
-            const data = await getBookTableLib(user?.uid);
+            const data = await getBookTableLib(user.uid);
             if (data?.data) {
                 setBooks(data.data);
             }
