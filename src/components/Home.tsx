@@ -18,21 +18,6 @@ type Todo = {
     title: string;
 };
 
-type ActionData = {
-    id: number;
-    content: string;
-    frequency: string;
-    learning_id: number;
-    firebase_uid: string;
-    learnings: {
-        id: number;
-        book_id: number;
-        books: {
-        title: string;
-        };
-    };
-};
-
 export const Home: FC = memo(() => {
     const { user } = useAuthContext();
 
@@ -54,7 +39,7 @@ export const Home: FC = memo(() => {
     }, []);
 
     useEffect(() => {
-        if (!user?.uid) return;
+        if (!user?.uid || !user.email) return;
         const fetchData = async () => {
             const userNameData = await getBookUserTableLib(user.email);
             if (userNameData?.data) {
@@ -63,7 +48,7 @@ export const Home: FC = memo(() => {
             
             const data = await getActionsTableLib(userNameData?.data.firebase_uid);
             if (data?.data) {
-                const todos = (data.data as ActionData[]).map((item) => ({
+                const todos = data.data.map((item: any) => ({
                     id: item.id,
                     content: item.content,
                     learning_id: item.learning_id,
