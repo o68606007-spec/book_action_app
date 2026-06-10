@@ -18,6 +18,21 @@ type Todo = {
     title: string;
 };
 
+type ActionData = {
+    id: number;
+    content: string;
+    frequency: string;
+    learning_id: number;
+    firebase_uid: string;
+    learnings: {
+        id: number;
+        book_id: number;
+        books: {
+        title: string;
+        };
+    };
+};
+
 export const Home: FC = memo(() => {
     const { user } = useAuthContext();
 
@@ -40,14 +55,14 @@ export const Home: FC = memo(() => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const userNameData = await getBookUserTableLib(user.email);
+            const userNameData = await getBookUserTableLib(user?.email);
             if (userNameData?.data) {
                 setUserName(userNameData?.data.name);
             }
             
             const data = await getActionsTableLib(userNameData?.data.firebase_uid);
             if (data?.data) {
-                const todos = data.data.map(item => ({
+                const todos = (data.data as ActionData[]).map((item) => ({
                     id: item.id,
                     content: item.content,
                     learning_id: item.learning_id,
@@ -67,7 +82,7 @@ export const Home: FC = memo(() => {
 
     return (
         <>
-        <Box maxW="800px" mx="auto" p={6} onClick={() => console.log("box click")}>
+        <Box maxW="800px" mx="auto" p={6}>
             <h2>ホーム</h2>
             <p>ようこそ,{userName}さん</p>
             <p>本日のTODOリスト</p>
@@ -96,7 +111,7 @@ export const Home: FC = memo(() => {
             </VStack>
             <HStack justify="center" mt={4}>
                 <Button asChild w="180px">
-                    <Link to="/book" onClick={() => console.log("book click")}>
+                    <Link to="/book">
                     本一覧画面はこちら
                     </Link>
                 </Button>

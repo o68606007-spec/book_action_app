@@ -47,10 +47,10 @@ export const BookId: FC = memo((props) => {
                 return;
             }
             const bookTitleData = await getBookTitleTableLib(Number(bookId));
-            const bookContentData = await getLearningsContentTableLib(Number(bookId));
+            // const bookContentData = await getLearningsContentTableLib(Number(bookId));
             reset({
                 title: bookTitleData?.data.title,
-                content: bookContentData?.data.content || "",
+                // content: bookContentData?.data.content || "",
             })
         };
         fetchBookData();

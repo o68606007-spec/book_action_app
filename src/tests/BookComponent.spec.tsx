@@ -114,7 +114,7 @@ describe("Book", () => {
       </MemoryRouter>
     );
     const user = userEvent.setup();
-    const changebox = await screen.findByRole("button", { name: "変更" });
+    const changebox = await screen.findByRole("button", { name: "追加" });
     await user.click(changebox);
     expect(mockedNavigator).toHaveBeenCalledWith(`/book/${mockData[0].id}`);
   });

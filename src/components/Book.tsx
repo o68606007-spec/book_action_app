@@ -22,7 +22,7 @@ export const Book: FC = memo(() => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getBookTableLib(user.uid);
+            const data = await getBookTableLib(user?.uid);
             if (data?.data) {
                 setBooks(data.data);
             }
@@ -62,7 +62,7 @@ export const Book: FC = memo(() => {
                     </Card.Body>
                         <Card.Footer justifyContent="flex-end">
                             <Button variant="outline" onClick={() => handleChange(book.id)}>
-                                変更
+                                追加
                             </Button>
                             <Button variant="outline" onClick={() => handleDelete(book.id)}>
                                 削除

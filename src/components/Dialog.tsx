@@ -34,7 +34,7 @@ export const Dialogs: FC<DialogProps> = memo((prop) => {
             return;
         }
 
-        const registerData = await insertActionsTableLib({ content: data.content, learning_id: learningId, frequency: data.frequency, firebase_uid: user.uid });
+        const registerData = await insertActionsTableLib({ content: data.content, learning_id: learningId, frequency: data.frequency, firebase_uid: user?.uid });
 
         setOpen(false);
         reset();
