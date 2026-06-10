@@ -1,6 +1,6 @@
 import { memo, FC, useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Field, Input, Stack, HStack } from "@chakra-ui/react";
+import { Button, Field, Input, Stack, HStack, Box, Flex } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { useAuthContext } from "../context/AuthContext";
@@ -58,7 +58,9 @@ export const BookId: FC = memo((props) => {
 
     return (
         <>
-            <h1>本詳細</h1>
+        <Flex minH="100vh" justify="center" align="center">
+        <Box maxW="800px" mx="auto" p={6}>
+            <h2>本詳細</h2>
             <form onSubmit={onSubmit}>
             <Stack gap="4" align="flex-start" maxW="sm">
                 <Field.Root invalid={!!errors.title} data-testid="title">
@@ -87,8 +89,10 @@ export const BookId: FC = memo((props) => {
                 </HStack>
             </Stack>
             </form>
-            {learningId && (<Dialogs open={isDialogOpen} setOpen={setIsDialogOpen} learningId={learningId} />)}
+            {learningId && isDialogOpen && (<Dialogs open={isDialogOpen} setOpen={setIsDialogOpen} learningId={learningId} />)}
             <LogoutButton />
+        </Box>
+        </Flex>
         </>
     )
     }    

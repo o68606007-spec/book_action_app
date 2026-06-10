@@ -1,9 +1,10 @@
 import { memo, FC, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { Button, Field, Input, Stack, Flex, Card, Box, HStack } from "@chakra-ui/react";
 
 import { useAuthContext } from "../context/AuthContext";
 import { getActionsLogTableLib } from "../lib/GetActionsLogTableLib";
-import { getActionsTableLib } from "../lib/GetActionsTableLib";
+import { getActionIndividualTableLib } from "../lib/GetActionIndividualTableLib";
 import { LogoutButton } from "./atom/LogoutButton";
 import { GoHomeButton } from "./atom/GoHomeButton";
 
@@ -19,6 +20,7 @@ type logs = {
     is_done: boolean;
     actions: {
         content: string;
+        firebase_uid: string;
     }
 };
 
@@ -46,13 +48,13 @@ export const Analysis: FC = memo(() => {
         (
             async () => {
                 const fetchData = async () => {
-                    const logsData = await getActionsLogTableLib();
+                    const logsData = await getActionsLogTableLib(user.uid);
                     if (logsData?.data) {
                         setActionsLogs(logsData?.data);
                     }
-                    const actionData = await getActionsTableLib();
-                    if (actionData?.data) {
-                        setActions(actionData?.data);
+                    const actionIndividualData = await getActionIndividualTableLib(user.uid);
+                    if (actionIndividualData?.data) {
+                        setActions(actionIndividualData?.data);
                     }
                 }
                 fetchData();
@@ -62,11 +64,12 @@ export const Analysis: FC = memo(() => {
 
     return (
         <>
-            <h1>継続分析</h1>
+        <Box maxW="800px" mx="auto" p={6}>
+            <h2>継続分析</h2>
 
             <hr />
 
-            <h2>全体分析</h2>
+            <h3>全体分析</h3>
 
             <p>総継続日数: {uniqueDates.length}日</p>
 
@@ -76,7 +79,7 @@ export const Analysis: FC = memo(() => {
 
             <hr />
 
-            <h2>行動別分析</h2>
+            <h3>行動別分析</h3>
             {actions.map((action) => {
                 const actionspatternLogs = actionsLogs.filter(log => log.action_id === action.id);
                 const actionUniqueDates = [...new Set(actionspatternLogs.map(log => log.executed_at.split("T")[0]))];
@@ -95,9 +98,18 @@ export const Analysis: FC = memo(() => {
                 </div>
                 )
             })}
-            <Link to="/book">本一覧画面はこちら</Link>
-            <GoHomeButton />
-            <LogoutButton />
+            <HStack justify="center" mt={4}>
+                <Button asChild w="180px">
+                    <Link to="/book">
+                    本一覧画面はこちら
+                    </Link>
+                </Button>
+
+                <GoHomeButton />
+                <LogoutButton />
+            </HStack>
+
+        </Box>
         </>
     )
     }    

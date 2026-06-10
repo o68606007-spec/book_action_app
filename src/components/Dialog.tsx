@@ -1,9 +1,9 @@
 import { memo, FC, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { Button, Input, Group, Dialog, Portal, CloseButton, useDisclosure } from '@chakra-ui/react';
+import { Button, Input, Group, Dialog, Portal, CloseButton, useDisclosure, VStack, HStack } from '@chakra-ui/react';
 
-
+import { useAuthContext } from "../context/AuthContext";
 import { supabase } from "../utils/supabase";
 import { insertActionsTableLib } from "../lib/InsertActionsTableLib";
 
@@ -14,11 +14,12 @@ type DialogProps = {
 }
 
 type FormValues = {
-    actionContent: string;
+    content: string;
     frequency: string;
 }
 
 export const Dialogs: FC<DialogProps> = memo((prop) => {
+    const { user } = useAuthContext();
     const { open, setOpen, learningId } = prop
     const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>();
     const navigate = useNavigate();
@@ -33,11 +34,13 @@ export const Dialogs: FC<DialogProps> = memo((prop) => {
             return;
         }
 
-        const registerData = await insertActionsTableLib({ actionContent: data.actionContent, learning_Id: learningId, frequency: data.frequency });
+        const registerData = await insertActionsTableLib({ content: data.content, learning_id: learningId, frequency: data.frequency, firebase_uid: user.uid });
 
         setOpen(false);
         reset();
-        navigate("/home");
+        requestAnimationFrame(() => {
+            navigate("/home");
+        });
         }, [setOpen, reset])
 
     return (
@@ -52,15 +55,19 @@ export const Dialogs: FC<DialogProps> = memo((prop) => {
                     </Dialog.Header>
                     <Dialog.Body>
                         <Group attached w="fall" maxW="lg">
-                            <Input type="text" {...register("actionContent", {required:"内容の入力は必須です",})} data-testid="content-input"/>
-                                    {errors.actionContent && <p style={{ color: "red" }} data-testid="actionContent-error">{errors.actionContent.message}</p>}
+                            <VStack align="stretch">
+                            <Input type="text" {...register("content", {required:"内容の入力は必須です",})} data-testid="content-input"/>
+                                    {errors.content && <p style={{ color: "red" }} data-testid="actionContent-error">{errors.content.message}</p>}
                             <br />
-                            <label htmlFor="frequency" data-testid="frequency-label">頻度:</label>
-                            <select id="frequency" {...register("frequency")} data-testid="frequency-select">
-                                <option value="daily">毎日</option>
-                                <option value="weekly">毎週</option>
-                                <option value="monthly">毎月</option>
-                            </select>
+                            <HStack gap={4}>
+                                <label htmlFor="frequency" data-testid="frequency-label">頻度:</label>
+                                <select id="frequency" {...register("frequency")} data-testid="frequency-select">
+                                    <option value="daily">毎日</option>
+                                    <option value="weekly">毎週</option>
+                                    <option value="monthly">毎月</option>
+                                </select>
+                            </HStack>
+                            </VStack>
                         </Group>
                     </Dialog.Body>
                     <Dialog.Footer>

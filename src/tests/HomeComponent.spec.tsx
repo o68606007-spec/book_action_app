@@ -66,6 +66,13 @@ vi.mock("../lib/GetActionsTableLib", () => ({
         learning_id: 1,
         content: "A",
         frequency: "daily",
+        learnings: {
+          id: 1,
+          book_id: 1,
+          books: {
+            title: "A"
+          },
+        },
       },
     ],
     error: null
@@ -74,14 +81,14 @@ vi.mock("../lib/GetActionsTableLib", () => ({
 
 vi.mock("../lib/GetBookUserTableLib", () => ({
   getBookUserTableLib: async () => ({
-    data: [
+    data: 
       {
         user_id: "testA",
-        firebase_id: "testA",
+        firebase_uid: "testA",
         email: "test@test.com",
         name: "テストユーザーA",
       }
-    ],
+    ,
     error: null
   })
 }));
@@ -91,9 +98,10 @@ beforeEach(() => {
   mockData = [
     {
       user_id: "testA",
-      firebase_id: "testA",
+      firebase_uid: "testA",
       email: "test@test.com",
       name: "テストユーザーA",
+      title: "A"
     },
   ];
 });
@@ -114,7 +122,7 @@ describe("Home", () => {
       </MemoryRouter>
     );
     expect(await screen.getByRole("heading", { name: "ホーム" })).toBeInTheDocument();
-    expect(await screen.findByText(`Welcome,${mockData[0].name}`)).toBeInTheDocument();
+    expect(await screen.findByText(`ようこそ,${mockData[0].name}さん`)).toBeInTheDocument();
     expect(await screen.getByText("本日のTODOリスト")).toBeInTheDocument();
   });
 
@@ -130,6 +138,8 @@ describe("Home", () => {
     );
     const user = userEvent.setup();
     await screen.findByText("行動内容: A");
+    await screen.findByText("📖 本: A");
+    await screen.findByText("🔁 頻度: daily");
     await screen.debug();
     const checkbox = await screen.getByRole("checkbox");
     await user.click(checkbox);

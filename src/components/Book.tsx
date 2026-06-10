@@ -1,5 +1,5 @@
 import { memo, FC, useCallback, useEffect, useState } from "react";
-import { Button, Card, HStack } from "@chakra-ui/react"
+import { Button, Card, HStack, Text, Box, Flex } from "@chakra-ui/react"
 import { useNavigate } from "react-router-dom";
 
 import { useAuthContext } from "../context/AuthContext";
@@ -22,7 +22,7 @@ export const Book: FC = memo(() => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getBookTableLib();
+            const data = await getBookTableLib(user.uid);
             if (data?.data) {
                 setBooks(data.data);
             }
@@ -50,7 +50,9 @@ export const Book: FC = memo(() => {
 
     return (
         <>
-            <h1>本一覧</h1>
+        <Box maxW="800px" mx="auto" p={6}>
+            <h2>本一覧</h2>
+            <Flex wrap="wrap" gap={4}>
             {books.map((book) => (
                 <div key={book.id}>
                 <Card.Root width="320px">
@@ -69,6 +71,7 @@ export const Book: FC = memo(() => {
                     </Card.Root>
                 </div>
             ))}
+            </Flex>
             <HStack justify="space-between" width="100%">
                 <Button colorScheme="blue" onClick={() => handleAdd()}>
                     本を追加
@@ -76,6 +79,7 @@ export const Book: FC = memo(() => {
                 <GoHomeButton />
             </HStack>
             <LogoutButton />
+        </Box>
         </>
     )
     }    

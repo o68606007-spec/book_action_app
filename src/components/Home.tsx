@@ -1,5 +1,5 @@
 import { memo, FC, useEffect, useState, useCallback } from "react";
-import { Checkbox, VStack, Box  } from "@chakra-ui/react";
+import { Checkbox, VStack, Text, Box, Button, HStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 
 import { useAuthContext } from "../context/AuthContext";
@@ -14,13 +14,15 @@ type Todo = {
     content: string;
     learning_id: number;
     frequency: string;
+    firebase_uid: string;
+    title: string;
 };
 
 export const Home: FC = memo(() => {
     const { user } = useAuthContext();
 
     const [userName, setUserName] = useState<string>("");
-    const [todos, setTodos] = useState<Todo[]>([])
+    const [todos, setTodos] = useState<Todo[]>([]);
 
     const handleCheck = useCallback(async (todoId: number) => {
         const result = await insertActionsLogTableLib(todoId);
@@ -38,26 +40,36 @@ export const Home: FC = memo(() => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getActionsTableLib();
-                if (data?.data) {
-                    setTodos(data?.data);
-                }
-            const userNameData = await getBookUserTableLib();
-                if (userNameData?.data) {
-                    const foundUser = userNameData.data.find((item) => item.firebase_id === user?.uid);
-                    if (foundUser) {
-                        setUserName(foundUser.name);
-                    }
-
-                }
+            const userNameData = await getBookUserTableLib(user.email);
+            if (userNameData?.data) {
+                setUserName(userNameData?.data.name);
+            }
+            
+            const data = await getActionsTableLib(userNameData?.data.firebase_uid);
+            if (data?.data) {
+                const todos = data.data.map(item => ({
+                    id: item.id,
+                    content: item.content,
+                    learning_id: item.learning_id,
+                    frequency: item.frequency,
+                    firebase_uid: item.firebase_uid,
+                    title: item.learnings?.books?.title ?? "",
+                }));
+                setTodos(todos);
+            }
         };
         fetchData();
+        document.body.style.pointerEvents = "";
+
+        document.body.removeAttribute("data-inert");
+        document.body.removeAttribute("data-scroll-lock");
     },[])
 
     return (
         <>
-            <h1>ホーム</h1>
-            <p>Welcome,{userName}</p>
+        <Box maxW="800px" mx="auto" p={6} onClick={() => console.log("box click")}>
+            <h2>ホーム</h2>
+            <p>ようこそ,{userName}さん</p>
             <p>本日のTODOリスト</p>
             <VStack align="stretch">
             {todos.map((todo) => (
@@ -65,17 +77,39 @@ export const Home: FC = memo(() => {
                     <Checkbox.Root>
                     <Checkbox.HiddenInput />
                     <Checkbox.Control />
-                    <label>
-                        行動内容: {todo.content}
-                    </label>
+                        <VStack align="start">
+                            <Text fontWeight="bold">
+                                行動内容: {todo.content}
+                            </Text>
+
+                            <Text>
+                                📖 本: {todo.title}
+                            </Text>
+
+                            <Text>
+                                🔁 頻度: {todo.frequency}
+                            </Text>
+                            </VStack>
                     </Checkbox.Root>
-                    <p>頻度: {todo.frequency}</p>
                 </Box>
             ))}
             </VStack>
-            <Link to="/book">本一覧画面はこちら</Link>
-            <Link to="/analysis">継続分析画面はこちら</Link>
-            <LogoutButton />
+            <HStack justify="center" mt={4}>
+                <Button asChild w="180px">
+                    <Link to="/book" onClick={() => console.log("book click")}>
+                    本一覧画面はこちら
+                    </Link>
+                </Button>
+
+                <Button asChild w="180px">
+                    <Link to="/analysis">
+                    継続分析画面はこちら
+                    </Link>
+                </Button>
+
+                <LogoutButton />
+            </HStack>
+        </Box>
         </>
     )
     }    

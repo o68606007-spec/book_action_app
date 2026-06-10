@@ -64,6 +64,7 @@ vi.mock("../lib/GetActionsLogTableLib", () => ({
         is_done: true,
         actions: {
           content: "A",
+          firebase_uid: "testA",
         }
       }
     ],
@@ -71,8 +72,8 @@ vi.mock("../lib/GetActionsLogTableLib", () => ({
   })
 }));
 
-vi.mock("../lib/GetActionsTableLib", () => ({
-  getActionsTableLib: async () => ({
+vi.mock("../lib/GetActionIndividualTableLib", () => ({
+  getActionIndividualTableLib: async () => ({
     data: [
       {
         id: 1,
