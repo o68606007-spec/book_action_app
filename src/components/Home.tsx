@@ -64,7 +64,7 @@ export const Home: FC = memo(() => {
 
         document.body.removeAttribute("data-inert");
         document.body.removeAttribute("data-scroll-lock");
-    },[])
+    },[user])
 
     return (
         <>
