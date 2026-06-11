@@ -323,3 +323,4 @@ console.log(getActionsLogData.data);
 
 onClick={() => handleCheck(todo.id)}
 
+onClick={() => console.log("check")}
