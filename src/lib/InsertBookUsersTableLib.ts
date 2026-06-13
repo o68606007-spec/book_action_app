@@ -10,12 +10,12 @@ type insertData = {
 
 export const insertBookUsersTableLib = async ({user_id, firebase_uid, email, name}: insertData) => {
 
-    const exsistingUser = await supabase.from("book-users").select("*").eq("firebase_id", firebase_uid).single();
-    if (exsistingUser.data) {
-        return {
-            status: "exsisting_user",
-        };
-    }
+    // const exsistingUser = await supabase.from("book-users").select("*").eq("firebase_id", firebase_uid).single();
+    // if (exsistingUser.data) {
+    //     return {
+    //         status: "exsisting_user",
+    //     };
+    // }
 
     const registerBookUsers = await supabase.from("book-users").insert({ user_id, firebase_uid, email, name });
     if (registerBookUsers.error) {

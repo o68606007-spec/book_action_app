@@ -22,6 +22,8 @@ export const Signup: FC = memo(() => {
     const { register, handleSubmit, formState: { errors } } = useForm<FormData>();
 
     const onSubmit = useCallback(handleSubmit(async (data: FormData) => {
+
+        try {
         // Firebase Auth登録
         const userCredential = await createUserWithEmailAndPassword(
                     auth,
@@ -31,16 +33,18 @@ export const Signup: FC = memo(() => {
 
         const firebaseUser = userCredential.user;
 
-        const registerBookUsers = await insertBookUsersTableLib({user_id: firebaseUser.uid, firebase_uid: firebaseUser.uid, email: firebaseUser.email, name: data.name });
-        if (registerBookUsers?.status === "exsisting_user") {
-            alert("既に登録されているユーザーです");
-            return;
-        }
-        
-        if (registerBookUsers?.status === "success") {
-            alert("ユーザーの登録が完了しました");
-            navigate("/home"); 
-        }
+        const registerBookUsers = await insertBookUsersTableLib({ user_id: firebaseUser.uid, firebase_uid: firebaseUser.uid, email: firebaseUser.email, name: data.name });
+            if (registerBookUsers?.status === "success") {
+                alert("ユーザーの登録が完了しました");
+                navigate("/home"); 
+            }   
+        } catch (error: any) {
+            if (error.code === "auth/email-already-in-use") {
+                alert("既に登録されているユーザーです");
+                return;
+            }
+            alert("登録に失敗しました");
+        }    
     }),[navigate]);
 
     return (
